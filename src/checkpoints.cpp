@@ -33,32 +33,31 @@ namespace Checkpoints
     //   (no blocks before with a timestamp after, none after with
     //    timestamp before)
     // + Contains no strange transactions
-	///TODO:  FIXME (Orgcoin)
+
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
-        (
-            22904,   uint256("0x7ec149bc57fbb1c388e76be2f9b8bec21164ca34655299e58d4f7346fd27746a")
-	);
-///TODO:  FIXME (Orgcoin)
+        (   0,   uint256("0x78cfa44f8619856c6a71d2b93744c3742753c6a24db7e03f57531518dbbbb5df"));
+
     static const CCheckpointData data = {
         &mapCheckpoints,
-        1386979204, // * UNIX timestamp of last checkpoint block
-        24153,    // * total number of transactions between genesis and last checkpoint
+        1390566000, // * UNIX timestamp of last checkpoint block
+        0,    // * total number of transactions between genesis and last checkpoint
                     //   (the tx=... number in the SetBestChain debug.log lines)
-        960.0     // * estimated number of transactions per day after checkpoint
+        //960.0     // * estimated number of transactions per day after checkpoint
+        6 * 60 * 24 // 6 transactions per min * 60 mins in an hour * 24 hrs in a day
     };
 
-///TODO:  FIXME (Orgcoin)
+
     static MapCheckpoints mapCheckpointsTestnet = 
         boost::assign::map_list_of
-        (     0, uint256("b92bc49428b600d337b78489b252a8f42b41d4aafcd220b022236444a9bd0b2a"))
-        ;
-///TODO:  FIXME (Orgcoin)
+        (     0, uint256("b92bc49428b600d337b78489b252a8f42b41d4aafcd220b022236444a9bd0b2a"));
+
     static const CCheckpointData dataTestnet = {
         &mapCheckpointsTestnet,
-        1385836559,
-        1,
-        960.0
+        1390566000,
+        0,
+        //960.0
+        6 * 60 * 24 // 6 transactions per min * 60 mins in an hour * 24 hrs in a day
     };
 
     const CCheckpointData &Checkpoints() {

@@ -1,10 +1,46 @@
-Litecoin integration/staging tree
+Orgcoin integration/staging tree
 ================================
 
-http://www.litecoin.org
+http://www.orgcoin.org
 
 Copyright (c) 2009-2013 Bitcoin Developers
 Copyright (c) 2011-2013 Litecoin Developers
+Copyright (c) 2014 The Orgcoin Foundation
+
+What is Orgcoin?
+----------------
+Orgcoin is a new crypto-currency derived from the best ideas of Bitcoin, Litecoin & Devcoin.
+The core of Orgcoin is directly forked from United Scrypt Coin, Orgcoin is designed to be merge mined with Litecoin
+Orgcoin gives anyone the ability to donate to their favorite good cause.
+Each month 100% of the profits of the Orgcoin Foundation are donated to a good cause voted upon by our members.
+Additionally any non-profit, charity or other good cause may recieve donations directly to their wallet.
+
+Orgcoin features
+
+-10 second block targets
+-100 coin subsidy (remains flat, never changes)
+-Unlimited total coins
+-90/10 split in favor of the miners (90 coins from each block goes to the miner who discovers it, 10 coins go to the foundation)
+-1 hr difficulty retargets
+
+For more info go to www.orgcoin.org
+
+How to mine?
+---------------
+For best results mining of Orgcoin should be done against a pool that supports it.
+pool.orgcoin.org is one such pool.
+
+For those who do not wish to merge mine, simply build an orgcoin wallet, and edit the orgcoin.conf file adding
+setgenerate=true
+
+While you're in there also set the RPC settings.
+
+Then point cgminer or some other mining application to it, making sure to enable scrypt
+
+./cgminer --scrypt -O your.ip:port -u username -p password
+
+If you have difficulties please see the mining topic at orgcoin.org
+http://www.orgcoin.org/category/14/mining
 
 What is Litecoin?
 ----------------
@@ -24,51 +60,4 @@ the Litecoin client sofware, see http://www.litecoin.org.
 License
 -------
 
-Litecoin is released under the terms of the MIT license. See `COPYING` for more
-information or see http://opensource.org/licenses/MIT.
-
-Development process
--------------------
-
-Developers work in their own trees, then submit pull requests when they think
-their feature or bug fix is ready.
-
-If it is a simple/trivial/non-controversial change, then one of the Litecoin
-development team members simply pulls it.
-
-If it is a *more complicated or potentially controversial* change, then the patch
-submitter will be asked to start a discussion (if they haven't already) on the
-[mailing list](http://sourceforge.net/mailarchive/forum.php?forum_name=bitcoin-development).
-
-The patch will be accepted if there is broad consensus that it is a good thing.
-Developers should expect to rework and resubmit patches if the code doesn't
-match the project's coding conventions (see `doc/coding.txt`) or are
-controversial.
-
-The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/bitcoin/bitcoin/tags) are created
-regularly to indicate new official, stable release versions of Litecoin.
-
-Testing
--------
-
-Testing and code review is the bottleneck for development; we get more pull
-requests than we can review and test. Please be patient and help out, and
-remember this is a security-critical project where any mistake might cost people
-lots of money.
-
-### Automated Testing
-
-Developers are strongly encouraged to write unit tests for new code, and to
-submit new unit tests for old code.
-
-Unit tests for the core code are in `src/test/`. To compile and run them:
-
-    cd src; make -f makefile.unix test
-
-Unit tests for the GUI code are in `src/qt/test/`. To compile and run them:
-
-    qmake BITCOIN_QT_TEST=1 -o Makefile.test bitcoin-qt.pro
-    make -f Makefile.test
-    ./litecoin-qt_test
-
+Litecoin is released under the terms of the MIT license.

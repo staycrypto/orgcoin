@@ -1191,14 +1191,13 @@ void MapPort(bool)
 // Each pair gives a source name and a seed name.
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
-///TODO:  FIXME: Orgcoin will need it's own DNS seeds???  Might be best to just let IRC be our seed source.
 static const char *strMainNetDNSSeed[][2] = {
-    //{"usc.ax.lt", "dnsseed.usc.ax.lt"},
+    {"seed.orgcoin.org", "seed.orgcoin.org"},
     {NULL, NULL}
 };
 
 static const char *strTestNetDNSSeed[][2] = {
-    //{"usc.ax.lt", "testnet-dnsseed.usc.ax.lt"},
+    {"seed-test.orgcoin.org", "seed-test.orgcoin.org"},
     {NULL, NULL}
 };
 
@@ -1233,15 +1232,6 @@ void ThreadDNSAddressSeed()
 
     printf("%d addresses found from DNS seeds\n", found);
 }
-
-
-
-
-
-
-
-
-
 
 
 ///TODO:  FIXME: Orgcoin - Need to determine these values, how they're calculated and what to set.

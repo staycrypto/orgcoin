@@ -10,8 +10,9 @@
 #include "net.h"
 #include "script.h"
 #include "scrypt.h"
-
+#include "base58.h"
 #include <list>
+#include <vector>
 
 class CWallet;
 class CBlock;
@@ -65,6 +66,7 @@ inline bool MoneyRange(int64 nValue) { return (nValue >= 0); }//Orgcoin has no a
 
 /** Coinbase transaction outputs can only be spent after this number of new blocks (network rule) */
 static const int COINBASE_MATURITY = 6*60 ;/// 1 hour in 10sec blocks
+
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 /** Maximum number of script-checking threads allowed */
@@ -75,14 +77,7 @@ static const int fHaveUPnP = true;
 static const int fHaveUPnP = false;
 #endif
 
-
 extern CScript COINBASE_FLAGS;
-
-
-
-
-
-
 extern CCriticalSection cs_main;
 extern std::map<uint256, CBlockIndex*> mapBlockIndex;
 extern std::set<CBlockIndex*, CBlockIndexWorkComparator> setBlockIndexValid;

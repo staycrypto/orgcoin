@@ -18,7 +18,7 @@
 extern bool fTestNet;
 static inline unsigned short GetDefaultPort(const bool testnet = fTestNet)
 {
-    return testnet ? 33328 : 23328;
+    return testnet ? 6740 : 6742; //ORG[0..9] are Orgcoin ports, these are dervice from a standard phone key pad 0 is testnet 2[C] is live
 }
 
 

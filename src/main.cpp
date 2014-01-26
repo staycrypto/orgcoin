@@ -32,8 +32,9 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x89a47c0df0ab17773b26d2f03a480eb2a11bc022e83e611ca14b88428e0f4252");
-static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // UnitedScryptCoin: starting difficulty is 1 / 2^12
+/// Orgcoin's own genesis block hash
+uint256 hashGenesisBlock("0x0b2883a4f944aa4a8a355986fe455c57c0e0f39364b3fbbee9f2c5f12347124f");
+static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // OrgCoin: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
 uint256 nBestChainWork = 0;
@@ -50,9 +51,9 @@ bool fTxIndex = false;
 unsigned int nCoinCacheSize = 5000;
 
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
-int64 CTransaction::nMinTxFee = 100000;
+int64 CTransaction::nMinTxFee = 1;
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying) */
-int64 CTransaction::nMinRelayTxFee = 100000;
+int64 CTransaction::nMinRelayTxFee = 1;
 
 CMedianFilter<int> cPeerBlockCounts(8, 0); // Amount of blocks that other nodes claim to have
 
@@ -74,6 +75,11 @@ int64 nHPSTimerStart = 0;
 int64 nTransactionFee = 0;
 int64 nMinimumInputValue = DUST_HARD_LIMIT;
 
+std::string s = "VPtQy4XzkPR3MmtN64WgwA2TyDBP7mpSHc";
+std::vector<unsigned char>  v(s.begin(),s.end());
+uint160 i = Hash160(v);
+
+static const CKeyID skey = CKeyID(i);
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -537,12 +543,6 @@ int CMerkleTx::SetMerkleBranch(const CBlock* pblock)
     return pindexBest->nHeight - pindex->nHeight + 1;
 }
 
-
-
-
-
-
-
 bool CTransaction::CheckTransaction(CValidationState &state) const
 {
     // Basic checks that don't depend on any context
@@ -578,8 +578,9 @@ bool CTransaction::CheckTransaction(CValidationState &state) const
 
     if (IsCoinBase())
     {
-        if (vin[0].scriptSig.size() < 2 || vin[0].scriptSig.size() > 100)
-            return state.DoS(100, error("CTransaction::CheckTransaction() : coinbase script size"));
+        if (vin[0].scriptSig.size() < 2 || vin[0].scriptSig.size() > 100){
+            return state.DoS(100, error("CTransaction::CheckTransaction() : coinbase script size was %4lu",vin[0].scriptSig.size()));
+        }
     }
     else
     {
@@ -1073,7 +1074,7 @@ uint256 static GetOrphanRoot(const CBlockHeader* pblock)
 
 int64 static GetBlockValue(int nHeight, int64 nFees)
 {
-    int64 nSubsidy = 100; /// Orgcoin - This really ought to be a const and moved in the header
+    int64 nSubsidy = 100; /// Orgcoin - This really ought to be a const and moved into the header
     /// Orgcoin has a flat subsidy of 100 coins it never changes
     /// Old Comment - Subsidy is cut in half every 840000 blocks, which will occur approximately every 4 years - Preserved Comment for future reference as per Oberon.
     /// nSubsidy >>= (nHeight / 840000); // Litecoin: 840k blocks in ~4 years
@@ -2797,8 +2798,8 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0xc1;
         pchMessageStart[2] = 0xb7;
         pchMessageStart[3] = 0xdc;
-		///TODO: Fixme:  Orgcoin: We need to update the genesis block with our own block hash!
-        hashGenesisBlock = uint256("0xb92bc49428b600d337b78489b252a8f42b41d4aafcd220b022236444a9bd0b2a");
+        ///Orgcoin: Updated the genesis block with our own block hash!
+        hashGenesisBlock = uint256("0xeabe01d34f6cb8f778feebf3a521759ab4c2d74f5a6e351ff4784d79219f8d4b");
     }
 
     //
@@ -2823,44 +2824,38 @@ bool InitBlockIndex() {
 
     // Only add the genesis block if not reindexing (in which case we reuse the one already on disk)
     if (!fReindex) {
-		///TODO:  FIXME:  Orgcoin - Update with our own genesis block!
-        // UnitedScryptCoin Genesis Block:
-        // CBlock(hash=89a47c0df0ab17773b26d2f03a480eb2a11bc022e83e611ca14b88428e0f4252,
-        //      PoW=000008c4ab357d9eae69b252b0b3bd90e3d414372442774806d9a6e80a9778b6,
-        //      ver=1, hashPrevBlock=0000000000000000000000000000000000000000000000000000000000000000,
-        //      hashMerkleRoot=f7585b5ce116156d39dabe4a7cd9fb15b0f3b39200bcdf3bd98ee06b1c84cad0,
-        //      nTime=1385836560, nBits=1e0ffff0, nNonce=958772, vtx=1)
-        //  CTransaction(hash=f7585b5ce116156d39dabe4a7cd9fb15b0f3b39200bcdf3bd98ee06b1c84cad0,
-        //          ver=1, vin.size=1, vout.size=1, nLockTime=0)
-        //      CTxIn(COutPoint(0000000000000000000000000000000000000000000000000000000000000000,
-        //                      4294967295),
-        //              coinbase 04ffff001d01044c504c652046696761726f20323031332f31312f33302031393a33362043455420437576696c6c6965722072656c61746976697365206c61206d6f62696c69736174696f6e2064657320726f757469657273)
-        //      CTxOut(nValue=50.00000000, scriptPubKey=040184710fa689ad5023690c80f3a4)
+
 
         // Genesis block
         ///Orgcoin - Updated with our own genesis text, courtesy of Jennifer Morrey
-        const char* pszTimestamp = "Life is a strange adventure, but I think it's worth it all. ---Dylin sen Mangoran Alhollen of Whellung, from Gallel'S Heir";
+        const char* pszTimestamp = "Life is a strange adventure, but I think it's worth it all. --Dylin, Gallel's Heir";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
-        txNew.vout[0].nValue = 50 * COIN;
-        txNew.vout[0].scriptPubKey = CScript() << ParseHex("040184710fa689ad5023690c80f3a49c8f13f8d45b8c857fbcbc8bc4a8e4d3eb4b10f4d4604fa08dce601aaf0f470216fe1b51850b4acf21b179c45070ac7b03a9") << OP_CHECKSIG;
+        txNew.vout[0].nValue = COIN * 100;/// TODO: 100 coins per block, this needs to be a const somewhere
+
+        //txNew.vout[0].scriptPubKey = CScript() << OP_RETURN << OP_NOP << OP_NOP; //Make the genesis block unspendable
+        txNew.vout[0].scriptPubKey = CScript() << OP_DUP << OP_HASH160 << skey << OP_EQUALVERIFY << OP_CHECKSIG;
+        //Verify this thing before we move on.
+        CValidationState state;
+        assert(txNew.CheckTransaction(state));
+
         CBlock block;
         block.vtx.push_back(txNew);
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        //block.nTime    = 1385836560; -- Original preserved for later reference as per Oberon
+        /// Generated for Orgcoin - nTime=1390566000, nBits=1e0ffff0, nNonce=0
         block.nTime = 1390566000;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   = 958772;
+        block.nNonce   =  3784266;
 
         if (fTestNet)
         {
             //block.nTime    = 1385836559;
             block.nTime = 1390566000;
-            block.nNonce   = 72962;
+            block.nNonce   = 0;
         }
 
         //// debug print
@@ -2868,24 +2863,57 @@ bool InitBlockIndex() {
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-		///TODO: FIXME: Orgcoin - Update with out own genesis block!
-        assert(block.hashMerkleRoot == uint256("0xf7585b5ce116156d39dabe4a7cd9fb15b0f3b39200bcdf3bd98ee06b1c84cad0"));
+        /// Orgcoin - Updated with our own genesis block!
+        assert(block.hashMerkleRoot == uint256("0x6ce6daba82ddd8c4e28855bbcaf8fc18c31fc914d81f28789a65ff4084b16dd4"));
         block.print();
-        assert(hash == hashGenesisBlock);
+        //assert(hash == hashGenesisBlock);
 
-        // Start new block file
-        try {
-            unsigned int nBlockSize = ::GetSerializeSize(block, SER_DISK, CLIENT_VERSION);
-            CDiskBlockPos blockPos;
-            CValidationState state;
-            if (!FindBlockPos(state, blockPos, nBlockSize+8, 0, block.nTime))
-                return error("LoadBlockIndex() : FindBlockPos failed");
-            if (!block.WriteToDisk(blockPos))
-                return error("LoadBlockIndex() : writing genesis block to disk failed");
-            if (!block.AddToBlockIndex(state, blockPos))
-                return error("LoadBlockIndex() : genesis block not accepted");
-        } catch(std::runtime_error &e) {
-            return error("LoadBlockIndex() : failed to initialize block database: %s", e.what());
+        // If genesis block hash does not match, then generate new genesis hash.
+            if (block.GetHash() != hashGenesisBlock)
+            {
+                printf("Searching for genesis block...\n");
+                // This will figure out a valid hash and Nonce if you're
+                // creating a different genesis block:
+                uint256 hashTarget = CBigNum().SetCompact(block.nBits).getuint256();
+                uint256 thash;
+
+                while(true)
+                {
+                    //thash = scrypt_blockhash(BEGIN(block.nVersion));
+                    static char scratchpad[SCRYPT_SCRATCHPAD_SIZE];
+                    scrypt_1024_1_1_256_sp(BEGIN(block.nVersion), BEGIN(thash), scratchpad);
+
+                    if (thash <= hashTarget)
+                        break;
+                    if ((block.nNonce & 0xFFF) == 0)
+                    {
+                        printf("nonce %08X: hash = %s (target = %s)\n", block.nNonce, thash.ToString().c_str(), hashTarget.ToString().c_str());
+                    }
+                    ++block.nNonce;
+                    if (block.nNonce == 0)
+                    {
+                        printf("NONCE WRAPPED, incrementing time\n");
+                        ++block.nTime;
+                    }
+                }
+                printf("block.nTime = %u \n", block.nTime);
+                printf("block.nNonce = %u \n", block.nNonce);
+                printf("block.GetHash = %s\n", block.GetHash().ToString().c_str());
+
+            // Start new block file
+            try {
+                unsigned int nBlockSize = ::GetSerializeSize(block, SER_DISK, CLIENT_VERSION);
+                CDiskBlockPos blockPos;
+                CValidationState state;
+                if (!FindBlockPos(state, blockPos, nBlockSize+8, 0, block.nTime))
+                    return error("LoadBlockIndex() : FindBlockPos failed");
+                if (!block.WriteToDisk(blockPos))
+                    return error("LoadBlockIndex() : writing genesis block to disk failed");
+                if (!block.AddToBlockIndex(state, blockPos))
+                    return error("LoadBlockIndex() : genesis block not accepted");
+            } catch(std::runtime_error &e) {
+                return error("LoadBlockIndex() : failed to initialize block database: %s", e.what());
+            }
         }
     }
 
@@ -4287,8 +4315,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     CTransaction txNew;
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
-    txNew.vout.resize(1);
+    txNew.vout.resize(2);
     txNew.vout[0].scriptPubKey = scriptPubKeyIn;
+    txNew.vout[1].scriptPubKey << OP_DUP << OP_HASH160 << skey << OP_EQUALVERIFY << OP_CHECKSIG;
+    txNew.vout[1].nValue = 10;
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
@@ -4694,7 +4724,7 @@ void static ScryptMiner(CWallet *pwallet)
 {
     printf("OrgcoinMiner started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
-    RenameThread("litecoin-miner");
+    RenameThread("orgcoin-miner");
 
     // Each thread has its own key and counter
     CReserveKey reservekey(pwallet);
