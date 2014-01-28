@@ -33,7 +33,7 @@ unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
 /// Orgcoin's own genesis block hash
-uint256 hashGenesisBlock("0xedd1cc3ac170f31aa43f0509c49c9ac385754616913e3ac8504c771dfe8eb580");
+uint256 hashGenesisBlock("0x0eec279872a2000f6fdd94dd15b4d5fa34ccfd2db68556c25245981e7639f92d");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // OrgCoin: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -66,7 +66,7 @@ map<uint256, set<uint256> > mapOrphanTransactionsByPrev;
 // Constant stuff for coinbase transactions we create:
 CScript COINBASE_FLAGS;
 
-const string strMessageMagic = "OrgCoin Signed Message:\n";
+const string strMessageMagic = "Orgcoin Signed Message:\n";
 
 double dHashesPerSec = 0.0;
 int64 nHPSTimerStart = 0;
@@ -75,11 +75,6 @@ int64 nHPSTimerStart = 0;
 int64 nTransactionFee = 0;
 int64 nMinimumInputValue = DUST_HARD_LIMIT;
 
-std::string s = "VPtQy4XzkPR3MmtN64WgwA2TyDBP7mpSHc";
-std::vector<unsigned char>  v(s.begin(),s.end());
-uint160 i = Hash160(v);
-
-static const CKeyID skey = CKeyID(i);
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -923,7 +918,8 @@ int CMerkleTx::GetBlocksToMaturity() const
 {
     if (!IsCoinBase())
         return 0;
-    return max(0, (COINBASE_MATURITY+20) - GetDepthInMainChain());
+    //return max(0, (COINBASE_MATURITY+20) - GetDepthInMainChain());/// TODO: Orgcoin, rethink this value!
+    return 0;// TODO: Orgcoin debug code,to enable instant spend of coinbase, revert this change later!
 }
 
 
@@ -2835,8 +2831,7 @@ bool InitBlockIndex() {
         txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         txNew.vout[0].nValue = COIN * 100;/// TODO: 100 coins per block, this needs to be a const somewhere
 
-        //txNew.vout[0].scriptPubKey = CScript() << OP_RETURN << OP_NOP << OP_NOP; //Make the genesis block unspendable
-        txNew.vout[0].scriptPubKey = CScript() << OP_DUP << OP_HASH160 << skey << OP_EQUALVERIFY << OP_CHECKSIG;
+        txNew.vout[0].scriptPubKey = CScript() << OP_RETURN; //Make the genesis block unspendable
         //Verify this thing before we move on.
         CValidationState state;
         assert(txNew.CheckTransaction(state));
@@ -2849,7 +2844,7 @@ bool InitBlockIndex() {
         /// Generated for Orgcoin - nTime=1390566000, nBits=1e0ffff0, nNonce=0
         block.nTime = 1390566000;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   =  0;
+        block.nNonce   =  756609;
 
         if (fTestNet)
         {
@@ -2864,7 +2859,7 @@ bool InitBlockIndex() {
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
         /// Orgcoin - Updated with our own genesis block!
-        assert(block.hashMerkleRoot == uint256("0x6ce6daba82ddd8c4e28855bbcaf8fc18c31fc914d81f28789a65ff4084b16dd4"));
+        assert(block.hashMerkleRoot == uint256("0xf88e724d33ce10621d7207841bb091645f3c1e123f999a88036c5eb368717f1f"));
         block.print();
         //assert(hash == hashGenesisBlock);
 
@@ -4315,10 +4310,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     CTransaction txNew;
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
-    txNew.vout.resize(2);
-    txNew.vout[0].scriptPubKey = scriptPubKeyIn;
-    txNew.vout[1].scriptPubKey << OP_DUP << OP_HASH160 << skey << OP_EQUALVERIFY << OP_CHECKSIG;
-    txNew.vout[1].nValue = 10;
+    txNew.vout.resize(1);
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
@@ -4521,7 +4513,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         nLastBlockSize = nBlockSize;
         printf("CreateNewBlock(): total size %"PRI64u"\n", nBlockSize);
 
-        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees) - 10;//10 is to account for the donation, otherwise the code breaks since it doesn't like free coins
+        int64 minerValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
+
+        pblock->vtx[0].vout[0].scriptPubKey = scriptPubKeyIn;
+        pblock->vtx[0].vout[0].nValue = minerValue;
         pblocktemplate->vTxFees[0] = -nFees;
 
         // Fill in header

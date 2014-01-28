@@ -68,7 +68,7 @@ int BitcoinUnits::amountDigits(int unit)
 {
     switch(unit)
     {
-    case BTC: return 8; // 21,000,000 (# digits, without commas)
+    case BTC: return 15; // 21,000,000 (# digits, without commas)
     case mBTC: return 11; // 21,000,000,000
     case uBTC: return 14; // 21,000,000,000,000
     default: return 0;
@@ -79,7 +79,7 @@ int BitcoinUnits::decimals(int unit)
 {
     switch(unit)
     {
-    case BTC: return 8;
+    case BTC: return 0;
     case mBTC: return 5;
     case uBTC: return 2;
     default: return 0;

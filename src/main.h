@@ -65,8 +65,8 @@ static const int64 MAX_MONEY = 84000000 * COIN;
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0); }//Orgcoin has no actual max
 
 /** Coinbase transaction outputs can only be spent after this number of new blocks (network rule) */
-static const int COINBASE_MATURITY = 6*60 ;/// 1 hour in 10sec blocks
-
+//static const int COINBASE_MATURITY = 6*60 ;/// 1 hour in 10sec blocks
+static const int COINBASE_MATURITY = 1;
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 /** Maximum number of script-checking threads allowed */
