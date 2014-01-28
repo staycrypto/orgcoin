@@ -34,7 +34,7 @@ QString BitcoinUnits::name(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString("ORG");
+    case BTC: return QString::fromUtf8("ORG");
     case mBTC: return QString("mORG");
     case uBTC: return QString::fromUtf8("μORG");
     default: return QString("???");
@@ -56,7 +56,8 @@ qint64 BitcoinUnits::factor(int unit)
 {
     switch(unit)
     {
-    case BTC:  return 100000000;
+    //case BTC:  return 100000000;
+    case BTC:  return 1;
     case mBTC: return 100000;
     case uBTC: return 100;
     default:   return 100000000;
