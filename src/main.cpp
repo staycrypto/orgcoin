@@ -33,7 +33,7 @@ unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
 /// Orgcoin's own genesis block hash
-uint256 hashGenesisBlock("0x0b2883a4f944aa4a8a355986fe455c57c0e0f39364b3fbbee9f2c5f12347124f");
+uint256 hashGenesisBlock("0xedd1cc3ac170f31aa43f0509c49c9ac385754616913e3ac8504c771dfe8eb580");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // OrgCoin: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -2849,13 +2849,13 @@ bool InitBlockIndex() {
         /// Generated for Orgcoin - nTime=1390566000, nBits=1e0ffff0, nNonce=0
         block.nTime = 1390566000;
         block.nBits    = 0x1e0ffff0;
-        block.nNonce   =  3784266;
+        block.nNonce   =  0;
 
         if (fTestNet)
         {
             //block.nTime    = 1385836559;
             block.nTime = 1390566000;
-            block.nNonce   = 0;
+            block.nNonce   = 93083;
         }
 
         //// debug print
@@ -4521,7 +4521,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         nLastBlockSize = nBlockSize;
         printf("CreateNewBlock(): total size %"PRI64u"\n", nBlockSize);
 
-        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
+        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees) - 10;//10 is to account for the donation, otherwise the code breaks since it doesn't like free coins
         pblocktemplate->vTxFees[0] = -nFees;
 
         // Fill in header
