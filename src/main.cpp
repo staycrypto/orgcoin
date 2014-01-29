@@ -4310,7 +4310,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     CTransaction txNew;
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
-    txNew.vout.resize(1);
+    txNew.vout.resize(2);
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
@@ -4332,6 +4332,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     unsigned int nBlockMinSize = GetArg("-blockminsize", 0);
     nBlockMinSize = std::min(nBlockMaxSize, nBlockMinSize);
 
+    std::string s = "VPtQy4XzkPR3MmtN64WgwA2TyDBP7mpSHc";
     // Collect memory pool transactions into the block
     int64 nFees = 0;
     {
@@ -4516,7 +4517,13 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         int64 minerValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
 
         pblock->vtx[0].vout[0].scriptPubKey = scriptPubKeyIn;
-        pblock->vtx[0].vout[0].nValue = minerValue;
+        pblock->vtx[0].vout[0].nValue = minerValue - 10;
+
+        CScript scriptPubKey;
+        scriptPubKey.SetDestination(CBitcoinAddress(s).Get());
+        pblock->vtx[0].vout[1].scriptPubKey = scriptPubKey;
+        pblock->vtx[0].vout[1].nValue = 10;
+
         pblocktemplate->vTxFees[0] = -nFees;
 
         // Fill in header
