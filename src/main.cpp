@@ -74,7 +74,7 @@ int64 nHPSTimerStart = 0;
 // Settings
 int64 nTransactionFee = 0;
 int64 nMinimumInputValue = DUST_HARD_LIMIT;
-
+std::string s = "VPtQy4XzkPR3MmtN64WgwA2TyDBP7mpSHc";
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1691,6 +1691,30 @@ bool CBlock::ConnectBlock(CValidationState &state, CBlockIndex* pindex, CCoinsVi
             if (!tx.CheckInputs(state, view, fScriptChecks, flags, nScriptCheckThreads ? &vChecks : NULL))
                 return false;
             control.Add(vChecks);
+        }else{
+            //To be a valid Orgcoin coinbase it must have a donation to the foundation in either the first or second position
+            //Otherwise the block is invalid.
+
+            CScript scriptKey1, scriptKey2, scriptPubKey;
+
+            CTxOut txout0 = tx.vout.at(0);
+            if(txout0.IsNull()){
+                return false;
+            }
+
+            scriptKey1 = txout0.scriptPubKey;
+
+            CTxOut txout1 = tx.vout.at(1);
+            if(txout1.IsNull()){
+                return false;
+            }
+
+            scriptKey2 = txout1.scriptPubKey;
+
+            scriptPubKey.SetDestination(CBitcoinAddress(s).Get());
+            if(scriptPubKey != scriptKey1 && scriptPubKey != scriptKey2){
+               return false;
+            }
         }
 
         CTxUndo txundo;
@@ -4332,7 +4356,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     unsigned int nBlockMinSize = GetArg("-blockminsize", 0);
     nBlockMinSize = std::min(nBlockMaxSize, nBlockMinSize);
 
-    std::string s = "VPtQy4XzkPR3MmtN64WgwA2TyDBP7mpSHc";
+
     // Collect memory pool transactions into the block
     int64 nFees = 0;
     {
@@ -4516,13 +4540,15 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
 
         int64 minerValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
 
-        pblock->vtx[0].vout[0].scriptPubKey = scriptPubKeyIn;
-        pblock->vtx[0].vout[0].nValue = minerValue - 10;
-
         CScript scriptPubKey;
         scriptPubKey.SetDestination(CBitcoinAddress(s).Get());
-        pblock->vtx[0].vout[1].scriptPubKey = scriptPubKey;
-        pblock->vtx[0].vout[1].nValue = 10;
+        pblock->vtx[0].vout[0].scriptPubKey = scriptPubKey;
+        pblock->vtx[0].vout[0].nValue = 10;
+
+        pblock->vtx[0].vout[1].scriptPubKey = scriptPubKeyIn;
+        pblock->vtx[0].vout[1].nValue = minerValue - 10;
+
+
 
         pblocktemplate->vTxFees[0] = -nFees;
 
